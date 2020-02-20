@@ -9,16 +9,17 @@ function Accept(props) {
     getRootProps,
     getInputProps
   } = useDropzone({
+    multiple: true,
     accept: "image/jpeg, image/png"
   });
 
-  const acceptedFilesItems = acceptedFiles.map(file => (
+  const acceptedItems = acceptedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
   ));
 
-  const rejectedFilesItems = rejectedFiles.map(file => (
+  const rejectedItems = rejectedFiles.map(file => (
     <li key={file.path}>
       {file.path} - {file.size} bytes
     </li>
@@ -34,9 +35,9 @@ function Accept(props) {
       <br />
       <aside>
         <h4>Accepted files</h4>
-        <ul>{acceptedFilesItems}</ul>
+        <ul>{acceptedItems}</ul>
         <h4>Rejected files</h4>
-        <ul>{rejectedFilesItems}</ul>
+        <ul>{rejectedItems}</ul>
       </aside>
     </section>
   );
