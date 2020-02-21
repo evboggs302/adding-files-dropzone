@@ -1,21 +1,36 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import "./Maverick.css";
 
-function Accept(props) {
-  const {
-    acceptedFiles,
-    rejectedFiles,
-    getRootProps,
-    getInputProps
-  } = useDropzone({
-    multiple: true,
-    accept: "image/jpeg, image/png"
+function Basic(props) {
+  const [myFiles, setMyFiles] = useState([]);
+
+  const onDrop = useCallback(acceptedFiles => {
+    setMyFiles([...myFiles, ...acceptedFiles]);
   });
 
-  const acceptedItems = acceptedFiles.map(file => (
+  const options = {
+    onDrop: onDrop,
+    multiple: true,
+    accept: "image/*"
+  };
+
+  const { rejectedFiles, getRootProps, getInputProps } = useDropzone(options);
+
+  const removeFile = file => () => {
+    const newFiles = [...myFiles];
+    newFiles.splice(newFiles.indexOf(file), 1);
+    setMyFiles(newFiles);
+  };
+
+  const removeAll = () => {
+    setMyFiles([]);
+  };
+
+  const files = myFiles.map(file => (
     <li key={file.path}>
-      {file.path} - {file.size} bytes
+      {file.path} / {file.size} bytes{" "}
+      <button onClick={removeFile(file)}>Remove File</button>
     </li>
   ));
 
@@ -28,19 +43,18 @@ function Accept(props) {
   return (
     <section className="container">
       <div {...getRootProps({ className: "dropzone" })}>
-        <p>Drag 'n' drop some files here, or click to select files</p>
-        <em>(Only *.jpeg and *.png images will be accepted)</em>
         <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
       </div>
-      <br />
       <aside>
-        <h4>Accepted files</h4>
-        <ul>{acceptedItems}</ul>
-        <h4>Rejected files</h4>
+        <h4>Accepted Files</h4>
+        <ul>{files}</ul>
+        <h4>Rejected Files</h4>
         <ul>{rejectedItems}</ul>
       </aside>
+      {files.length > 0 && <button onClick={removeAll}>Remove All</button>}
     </section>
   );
 }
 
-export default Accept;
+export default Basic;
