@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import "./Maverick.css";
 
 function Basic(props) {
   const [myFiles, setMyFiles] = useState([]);
+  const [showImages, setShowImages] = useState(false);
 
   function removeDuplicates(array, key) {
     return array.reduce((accumulator, element) => {
@@ -14,16 +15,14 @@ function Basic(props) {
     }, []);
   }
 
-  const onDropAccepted = useCallback(acceptedFiles => {
+  const onDropAccepted = acceptedFiles => {
     if (myFiles.length) {
-      let copy = [...myFiles, ...acceptedFiles];
-      let final = removeDuplicates(copy, "name");
-      //   console.log("new copy", final);
+      let final = removeDuplicates([...myFiles, ...acceptedFiles], "name");
       setMyFiles(final);
     } else {
       setMyFiles([...myFiles, ...acceptedFiles]);
     }
-  });
+  };
 
   const options = {
     noKeyboard: true,
@@ -57,20 +56,33 @@ function Basic(props) {
     </li>
   ));
 
-  console.log(myFiles);
+  const mappedImages = myFiles.map((e, index) => {
+    return <img key={index} src={URL.createObjectURL(e)} alt={e.name} />;
+  });
+
+  console.log(myFiles.sort((a, b) => a["name"] - b["name"]));
   return (
     <section className="container">
+      {showImages ? <div>{mappedImages}</div> : <div />}
       <div {...getRootProps({ className: "dropzone" })}>
         <input {...getInputProps()} />
         <p>Drag 'n' drop some files here, or click to select files</p>
       </div>
       <aside>
         <h4>Accepted Files</h4>
-        <ul>{files.sort((a, b) => a.name - b.name)}</ul>
+        <ul>{files}</ul>
         <h4>Rejected Files</h4>
-        <ul>{rejects.sort((a, b) => a.name - b.name)}</ul>
+        <ul>{rejects}</ul>
       </aside>
-      {files.length > 0 && <button onClick={removeAll}>Remove All</button>}
+      {!files.length ? (
+        <div />
+      ) : (
+        <div>
+          <button onClick={removeAll}>Remove All</button>
+          <br />
+          <button onClick={() => setShowImages(true)}>Save/View</button>
+        </div>
+      )}
     </section>
   );
 }
